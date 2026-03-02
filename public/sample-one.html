@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FundWatch — Variant 1: Dark Editorial</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0c;
+    --surface: #121216;
+    --border: #1e1e24;
+    --text: #e8e6e1;
+    --muted: #7a7880;
+    --accent: #c9f560;
+    --accent-dim: #c9f56020;
+    --danger: #ff6b6b;
+    --warm: #f5c842;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 24px 48px;
+    background: rgba(10,10,12,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 14px;
+    font-weight: 400; transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .btn-nav {
+    background: var(--accent); color: #0a0a0c; border: none;
+    padding: 10px 24px; border-radius: 6px; font-size: 14px;
+    font-weight: 600; cursor: pointer; transition: all 0.3s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-nav:hover { transform: translateY(-1px); box-shadow: 0 4px 20px #c9f56040; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-align: center; padding: 120px 48px 80px;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, #c9f56008 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent-dim); border: 1px solid #c9f56030;
+    border-radius: 100px; padding: 8px 20px;
+    font-size: 13px; color: var(--accent); font-weight: 500;
+    margin-bottom: 40px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .tag-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 900; line-height: 1.05;
+    letter-spacing: -2px;
+    max-width: 900px;
+    animation: fadeUp 0.8s ease 0.1s both;
+  }
+  h1 em {
+    font-style: italic; color: var(--accent);
+    position: relative;
+  }
+  h1 em::after {
+    content: '';
+    position: absolute; bottom: 4px; left: 0; right: 0;
+    height: 3px; background: var(--accent); opacity: 0.3;
+  }
+
+  .hero-sub {
+    font-size: 18px; color: var(--muted);
+    max-width: 520px; line-height: 1.7;
+    margin-top: 28px; font-weight: 300;
+    animation: fadeUp 0.8s ease 0.2s both;
+  }
+
+  .hero-ctas {
+    display: flex; gap: 16px; margin-top: 48px;
+    animation: fadeUp 0.8s ease 0.3s both;
+  }
+  .btn-primary {
+    background: var(--accent); color: #0a0a0c;
+    padding: 16px 36px; border-radius: 8px;
+    font-size: 15px; font-weight: 600;
+    border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s;
+  }
+  .btn-primary:hover { box-shadow: 0 8px 32px #c9f56040; transform: translateY(-2px); }
+  .btn-secondary {
+    background: transparent; color: var(--text);
+    padding: 16px 36px; border-radius: 8px;
+    font-size: 15px; font-weight: 500;
+    border: 1px solid var(--border); cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s;
+  }
+  .btn-secondary:hover { border-color: var(--muted); }
+
+  /* SOCIAL PROOF */
+  .proof {
+    display: flex; align-items: center; gap: 12px;
+    margin-top: 48px; color: var(--muted); font-size: 13px;
+    animation: fadeUp 0.8s ease 0.4s both;
+  }
+  .proof-avatars {
+    display: flex;
+  }
+  .proof-avatars span {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid var(--bg);
+    margin-left: -8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+  }
+  .proof-avatars span:nth-child(1) { background: #3b82f6; margin-left: 0; }
+  .proof-avatars span:nth-child(2) { background: #8b5cf6; }
+  .proof-avatars span:nth-child(3) { background: #ec4899; }
+  .proof-avatars span:nth-child(4) { background: #f59e0b; }
+
+  /* FEATURES */
+  .features {
+    padding: 120px 48px;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .features-header {
+    text-align: center; margin-bottom: 80px;
+  }
+  .features-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px; font-weight: 700;
+    letter-spacing: -1px;
+  }
+  .features-header p {
+    color: var(--muted); margin-top: 16px;
+    font-size: 16px; max-width: 480px; margin-left: auto; margin-right: auto;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px 32px;
+    transition: all 0.4s;
+    position: relative; overflow: hidden;
+  }
+  .feature-card:hover {
+    border-color: #c9f56040;
+    transform: translateY(-4px);
+  }
+  .feature-card::after {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0; transition: opacity 0.4s;
+  }
+  .feature-card:hover::after { opacity: 1; }
+
+  .feature-icon {
+    width: 48px; height: 48px;
+    background: var(--accent-dim);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+  .feature-card h3 {
+    font-size: 18px; font-weight: 600; margin-bottom: 12px;
+  }
+  .feature-card p {
+    color: var(--muted); font-size: 14px; line-height: 1.7;
+  }
+
+  /* SIGNAL DEMO */
+  .demo-section {
+    padding: 80px 48px 120px;
+    max-width: 1000px; margin: 0 auto;
+  }
+  .demo-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 48px;
+    position: relative; overflow: hidden;
+  }
+  .demo-card::before {
+    content: '';
+    position: absolute; top: -200px; right: -200px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #c9f56006, transparent 70%);
+  }
+  .demo-label {
+    font-size: 12px; text-transform: uppercase;
+    letter-spacing: 2px; color: var(--accent);
+    font-weight: 500; margin-bottom: 24px;
+  }
+  .demo-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; margin-bottom: 32px;
+  }
+
+  .signal-list { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  .signal-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+  .signal-item:hover { border-color: #c9f56030; }
+  .signal-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .signal-dot.red { background: var(--danger); box-shadow: 0 0 12px #ff6b6b40; }
+  .signal-dot.yellow { background: var(--warm); box-shadow: 0 0 12px #f5c84240; }
+  .signal-dot.green { background: var(--accent); box-shadow: 0 0 12px #c9f56040; }
+  .signal-text { font-size: 14px; flex: 1; }
+  .signal-text strong { font-weight: 600; }
+  .signal-time { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+  /* CTA */
+  .cta-section {
+    padding: 120px 48px;
+    text-align: center;
+  }
+  .cta-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px; font-weight: 700;
+    letter-spacing: -1px; margin-bottom: 20px;
+  }
+  .cta-section p {
+    color: var(--muted); font-size: 16px;
+    max-width: 400px; margin: 0 auto 40px;
+  }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--muted); font-size: 13px;
+  }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links a:not(:last-child) { display: none; }
+    .hero { padding: 120px 24px 80px; }
+    .features { padding: 80px 24px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .demo-section { padding: 40px 24px 80px; }
+    .demo-card { padding: 28px; }
+    .cta-section { padding: 80px 24px; }
+    footer { padding: 30px 24px; flex-direction: column; gap: 12px; }
+  }
+</style>
+</head>
+<body>
+  <nav>
+    <div class="logo">Fund<span>Watch</span></div>
+    <div class="nav-links">
+      <a href="#">Features</a>
+      <a href="#">Pricing</a>
+      <a href="#">Docs</a>
+      <button class="btn-nav">Get Started</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="tag">
+      <span class="tag-dot"></span>
+      Now tracking 2,400+ portfolio signals
+    </div>
+    <h1>Alerts become <em>actions</em></h1>
+    <p class="hero-sub">
+      FundWatch turns noisy market signals into clear, prioritized tasks for your portfolio companies. Never miss what matters.
+    </p>
+    <div class="hero-ctas">
+      <button class="btn-primary">Start Free Trial</button>
+      <button class="btn-secondary">See Demo →</button>
+    </div>
+    <div class="proof">
+      <div class="proof-avatars">
+        <span>A</span><span>B</span><span>C</span><span>D</span>
+      </div>
+      Trusted by 120+ fund managers
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="features-header">
+      <h2>Everything you need to watch</h2>
+      <p>Monitor, alert, and act — all from one intelligent dashboard.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📡</div>
+        <h3>Signal Detection</h3>
+        <p>AI-powered monitoring across news, filings, social, and market data. Get the signal, not the noise.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔔</div>
+        <h3>Smart Alerts</h3>
+        <p>Configurable alert thresholds with severity scoring. Know what's urgent vs. what can wait.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <h3>Action Tasks</h3>
+        <p>Alerts automatically generate prioritized tasks. Track follow-ups, assign owners, close the loop.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Health Scoring</h3>
+        <p>Dynamic company health scores based on aggregated signals. Spot trouble before it escalates.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗂️</div>
+        <h3>Portfolio View</h3>
+        <p>Unified dashboard for your entire portfolio. Sort by health, filter by stage, drill into any company.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <h3>Integrations</h3>
+        <p>Connect with Slack, email, CRMs and data providers. FundWatch fits into your existing workflow.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo-section">
+    <div class="demo-card">
+      <div class="demo-label">Live Signal Feed</div>
+      <h3>Real-time portfolio intelligence</h3>
+      <ul class="signal-list">
+        <li class="signal-item">
+          <span class="signal-dot red"></span>
+          <span class="signal-text"><strong>Acme Corp</strong> — CFO departure announced in SEC filing</span>
+          <span class="signal-time">12 min ago</span>
+        </li>
+        <li class="signal-item">
+          <span class="signal-dot yellow"></span>
+          <span class="signal-text"><strong>NovaTech</strong> — Competitor raised $40M Series C</span>
+          <span class="signal-time">2 hrs ago</span>
+        </li>
+        <li class="signal-item">
+          <span class="signal-dot green"></span>
+          <span class="signal-text"><strong>Helios AI</strong> — Featured in TechCrunch top 50 list</span>
+          <span class="signal-time">5 hrs ago</span>
+        </li>
+        <li class="signal-item">
+          <span class="signal-dot yellow"></span>
+          <span class="signal-text"><strong>Greenfield Bio</strong> — Patent application published</span>
+          <span class="signal-time">1 day ago</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <h2>Start watching today</h2>
+    <p>Free for up to 5 portfolio companies. No credit card required.</p>
+    <button class="btn-primary">Get Started Free</button>
+  </section>
+
+  <footer>
+    <span>© 2026 FundWatch</span>
+    <div style="display:flex;gap:24px;">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+  </footer>
+</body>
+</html>
