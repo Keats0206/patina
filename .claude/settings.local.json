@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn tsc:*)",
+      "Bash(yarn add:*)",
+      "Bash(npx tsc:*)",
+      "Bash(grep:*)",
+      "Bash(git show:*)",
+      "Bash(sed:*)"
+    ]
+  }
+}

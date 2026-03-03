@@ -6,9 +6,8 @@ const gateway = createGateway({ apiKey: process.env.AI_GATEWAY_API_KEY });
 const INITIAL_HTML_PASS_SYSTEM = `You are an HTML normalizer for a design tool. You will receive raw HTML from a webpage (possibly partial, with external links or broken structure). Your job is to produce a single, clean, self-contained HTML document that:
 - Preserves the visible structure and content of the page
 - Fixes broken or invalid markup and closes tags where needed
-- Keeps or inlines critical CSS so the page renders with the same general look
+- Converts all styling to Tailwind CSS utility classes — include <script src="https://cdn.tailwindcss.com"></script> in the <head> and do not write custom <style> blocks
 - Removes or strips non-essential scripts, trackers, and noise that would not affect design iteration
-- Uses a single document with inline or embedded styles so it can be edited and varied later
 
 Return ONLY the complete HTML document. Do not wrap it in markdown code fences or add any explanation before or after.`;
 
@@ -35,26 +34,40 @@ export async function POST(request: Request) {
     );
   }
 
-  let sourceHtml: string;
-  try {
-    const res = await fetch(url, {
-      headers: { "User-Agent": "Patina/1.0 (Design import)" },
-      next: { revalidate: 0 },
-    });
-    if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-    sourceHtml = await res.text();
-  } catch (e) {
-    return new Response(
-      JSON.stringify({ error: "Failed to fetch URL" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
-  }
+  const encoder = new TextEncoder();
 
-  const result = streamText({
-    model: gateway("anthropic/claude-sonnet-4"),
-    system: INITIAL_HTML_PASS_SYSTEM,
-    messages: [{ role: "user", content: sourceHtml }],
+  const stream = new ReadableStream({
+    async start(controller) {
+      controller.enqueue(encoder.encode("\x00PATINA:fetching\x00"));
+
+      let sourceHtml: string;
+      try {
+        const res = await fetch(url, {
+          headers: { "User-Agent": "Patina/1.0 (Design import)" },
+          next: { revalidate: 0 },
+        });
+        if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+        sourceHtml = await res.text();
+      } catch {
+        controller.enqueue(encoder.encode("\x00PATINA:error:Failed to fetch URL\x00"));
+        controller.close();
+        return;
+      }
+
+      controller.enqueue(encoder.encode("\x00PATINA:processing\x00"));
+
+      const result = streamText({
+        model: gateway("anthropic/claude-opus-4.5"),
+        system: INITIAL_HTML_PASS_SYSTEM,
+        messages: [{ role: "user", content: sourceHtml }],
+      });
+
+      for await (const chunk of result.textStream) {
+        controller.enqueue(encoder.encode(chunk));
+      }
+      controller.close();
+    },
   });
 
-  return result.toTextStreamResponse();
+  return new Response(stream, { headers: { "Content-Type": "text/plain; charset=utf-8" } });
 }

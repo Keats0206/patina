@@ -2,6 +2,53 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 
+/** Ensures the Tailwind CDN script is present in the document. */
+export function injectTailwindCDN(html: string): string {
+  const tag = '<script src="https://cdn.tailwindcss.com"></script>';
+  if (html.includes("cdn.tailwindcss.com")) return html;
+  if (html.includes("</head>")) return html.replace("</head>", `${tag}\n</head>`);
+  if (html.includes("<head>")) return html.replace("<head>", `<head>\n${tag}`);
+  return tag + "\n" + html;
+}
+
+/** Inject an element-picker postMessage script before </body> for selection mode. */
+export function injectSelectionScript(html: string): string {
+  const script = `<script>(function(){
+    var SEL_STYLE='2px solid rgba(99,102,241,0.9)';
+    var HVR_STYLE='2px solid rgba(99,102,241,0.4)';
+    var SKIP=new Set(['HTML','BODY','HEAD','SCRIPT','STYLE','LINK','META','NOSCRIPT']);
+    var selected=new Set();
+    var hovered=null;
+    function label(el){
+      var tag=el.tagName.toLowerCase();
+      var text=(el.innerText||'').trim().replace(/\\s+/g,' ').slice(0,40);
+      return text?tag+' \u00b7 "'+text+'"':tag;
+    }
+    function broadcast(){
+      var snippets=Array.from(selected).map(function(el){return{html:el.outerHTML,label:label(el)};});
+      window.parent.postMessage({type:'patina-selection',snippets:snippets},'*');
+    }
+    document.addEventListener('mouseover',function(e){
+      var el=e.target;if(SKIP.has(el.tagName)||selected.has(el))return;
+      if(hovered&&hovered!==el){hovered.style.outline='';hovered.style.cursor='';}
+      hovered=el;el.style.outline=HVR_STYLE;el.style.cursor='crosshair';
+    },true);
+    document.addEventListener('mouseout',function(e){
+      var el=e.target;
+      if(el===hovered&&!selected.has(el)){el.style.outline='';el.style.cursor='';hovered=null;}
+    },true);
+    document.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      var el=e.target;if(SKIP.has(el.tagName))return;
+      if(selected.has(el)){selected.delete(el);el.style.outline='';el.style.cursor='';}
+      else{selected.add(el);el.style.outline=SEL_STYLE;}
+      broadcast();
+    },true);
+  })();<\/script>`;
+  if (html.includes("</body>")) return html.replace("</body>", script + "</body>");
+  return html + script;
+}
+
 /** Chunk HTML by element boundaries for streaming render. */
 export function chunkHTMLByElements(html: string): string[] {
   const chunks: string[] = [];
@@ -79,7 +126,7 @@ export function useIframeStreaming({
     const iframe = iframeRef.current;
     if (!iframe) return;
 
-    const chunks = chunkHTMLByElements(html);
+    const chunks = chunkHTMLByElements(injectTailwindCDN(html));
     setTotalChunks(chunks.length);
     setChunkIndex(0);
     setIsStreaming(true);

@@ -2,51 +2,59 @@
  * Flat list of one prompt per item. Tweet-length, general — the AI fills in the rest.
  */
 
-const varyStrongPrompt = `
-You are a design variant generator. You will receive an HTML document for a UI (any interface—landing page, dashboard, form, card, etc.). Create a STRONG design variant with noticeable differences across layout, typography, and color — think different layout paradigm, new typographic hierarchy, distinct color palette, different visual density, or reimagined component styles. The result should feel like a different designer made different bold choices. Text content and headings should convey the same meaning but tone and phrasing may adapt to fit the new design. Preserve semantic HTML and accessibility attributes. Return ONLY the complete HTML document with no markdown fences or explanation.
+const TAILWIND_INSTRUCTION = `Use Tailwind CSS utility classes for all styling. Include <script src="https://cdn.tailwindcss.com"></script> in the <head> so Tailwind loads via CDN. Do not write custom <style> blocks — use only Tailwind classes.`
+
+const makeVariantPrompt = `
+You are a design variant generator. You will receive an HTML document for a UI (any interface—landing page, dashboard, form, card, etc.). Create a distinct design variant — change layout, typography, color, or visual density so the result feels like a different designer made different choices. Text content and headings should convey the same meaning but tone and phrasing may adapt. Preserve semantic HTML and accessibility attributes. ${TAILWIND_INSTRUCTION} Return ONLY the complete HTML document with no markdown fences or explanation.
 `
 
-const varySubtlePrompt = `
-You are a design variant generator. You will receive an HTML document for a UI (any interface—landing page, dashboard, form, card, etc.). Create a SUBTLE design variant — consider refining spacing, adjusting typographic rhythm, tweaking colors, or shifting proportions. The result should feel like a polished iteration of the original, not a reinvention. Text content and headings should convey the same meaning but tone and phrasing may adapt to fit the new design. Preserve semantic HTML and accessibility attributes. Return ONLY the complete HTML document with no markdown fences or explanation.
+const restylePrompt = `
+You are a design variant generator. You will receive an HTML document for a UI (any interface—landing page, dashboard, form, card, etc.). Restyle it — change aesthetic mood, color palette, typographic voice, or visual style while keeping the same structure and content meaning. Preserve semantic HTML and accessibility attributes. ${TAILWIND_INSTRUCTION} Return ONLY the complete HTML document with no markdown fences or explanation.
 `
 
-const changeStylePrompt = `
-You are a design variant generator. You will receive an HTML document for a UI (any interface—landing page, dashboard, form, card, etc.). Reimagine this in a completely different visual style — think different aesthetic mood, design language, or era. Consider how brand personality, motion, texture, or typographic voice could shift the feeling entirely. Text content and headings should convey the same meaning but tone and phrasing may adapt to match the new aesthetic. Preserve semantic HTML and accessibility attributes. Return ONLY the complete HTML document with no markdown fences or explanation.
+const explorePrompt = `
+You are a design variant generator. You will receive an HTML document for a UI. Create a bold, exploratory design variant — make sweeping changes across color palette, layout structure, typography, and visual density as if a different designer with a completely different aesthetic made it. The result should feel like a genuinely different creative direction, not a subtle tweak. Text content should convey the same meaning. Preserve semantic HTML and accessibility attributes. ${TAILWIND_INSTRUCTION} Return ONLY the complete HTML document with no markdown fences or explanation.
 `
 
 const remixColorsPrompt = `
-You are a design variant generator. You will receive an HTML document for a UI (any interface—landing page, dashboard, form, card, etc.). Remix the color scheme entirely — consider new palette relationships between background, foreground, and accent, or explore different emotional registers through color temperature, saturation, or contrast. Typography and layout stay the same. Text content and headings should convey the same meaning but tone and phrasing may adapt to fit the new palette's mood. Preserve semantic HTML and accessibility attributes. Return ONLY the complete HTML document with no markdown fences or explanation.
+You are a design variant generator. You will receive an HTML document for a UI. Remix ONLY the color palette — change background colors, text colors, border colors, and accent colors to create a fresh color mood. Keep the layout, spacing, typography scale, and HTML structure completely identical. Preserve semantic HTML and accessibility attributes. ${TAILWIND_INSTRUCTION} Return ONLY the complete HTML document with no markdown fences or explanation.
 `
 
-const shuffleLayoutPrompt = `
-You are a design variant generator. You will receive an HTML document for a UI (any interface—landing page, dashboard, form, card, etc.). Rearrange the spatial layout — consider how changing element positioning, ordering, grouping, or flow could create a fresh experience. Text content and headings should convey the same meaning but tone and phrasing may adapt to fit the new structure. Preserve semantic HTML and accessibility attributes. Return ONLY the complete HTML document with no markdown fences or explanation.
-`
-
-const seeOtherViewsPrompt = `
-You are a design variant generator. You will receive an HTML document for a UI (any interface—landing page, dashboard, form, card, etc.). Reimagine this section using a completely different layout paradigm — consider how a structural departure from the original could better serve the content, hierarchy, or user flow. Text content and headings should convey the same meaning but tone and phrasing may adapt to fit the new paradigm. Preserve semantic HTML and accessibility attributes. Return ONLY the complete HTML document with no markdown fences or explanation.
+const remixLayoutPrompt = `
+You are a design variant generator. You will receive an HTML document for a UI. Remix ONLY the layout — reorder sections, change the grid structure, adjust spacing and density, rearrange navigation or content blocks. Keep the color palette, typographic style, and all text content identical. Preserve semantic HTML and accessibility attributes. ${TAILWIND_INSTRUCTION} Return ONLY the complete HTML document with no markdown fences or explanation.
 `
 
 const customizePrompt = (userPrompt: string) => `
-You are a design variant generator. You will receive an HTML document for a UI (any interface—landing page, dashboard, form, card, etc.). ${userPrompt}. Preserve semantic HTML and accessibility attributes. Return ONLY the complete HTML document with no markdown fences or explanation.
+You are a design variant generator. You will receive an HTML document for a UI (any interface—landing page, dashboard, form, card, etc.). ${userPrompt}. Preserve semantic HTML and accessibility attributes. ${TAILWIND_INSTRUCTION} Return ONLY the complete HTML document with no markdown fences or explanation.
 `
 
 export type PromptActionId =
-  | "varyStrong"
-  | "varySubtle"
-  | "changeStyle"
+  | "makeVariant"
+  | "restyle"
+  | "explore"
   | "remixColors"
-  | "shuffleLayout"
-  | "seeOtherViews"
+  | "remixLayout"
   | "customize";
 
 const promptById: Record<Exclude<PromptActionId, "customize">, string> = {
-  varyStrong: varyStrongPrompt,
-  varySubtle: varySubtlePrompt,
-  changeStyle: changeStylePrompt,
+  makeVariant: makeVariantPrompt,
+  restyle: restylePrompt,
+  explore: explorePrompt,
   remixColors: remixColorsPrompt,
-  shuffleLayout: shuffleLayoutPrompt,
-  seeOtherViews: seeOtherViewsPrompt,
+  remixLayout: remixLayoutPrompt,
 };
+
+export function injectContextIntoPrompt(
+  basePrompt: string,
+  userContext?: string,
+  projectContext?: string
+): string {
+  const parts: string[] = [];
+  if (userContext?.trim()) parts.push(`<user_aesthetic_preferences>\n${userContext.trim()}\n</user_aesthetic_preferences>`);
+  if (projectContext?.trim()) parts.push(`<project_context>\n${projectContext.trim()}\n</project_context>`);
+  if (parts.length === 0) return basePrompt;
+  return `The following context should inform your design decisions:\n\n${parts.join("\n\n")}\n\n${basePrompt}`;
+}
 
 export function getPromptForAction(id: PromptActionId, customPrompt?: string): string {
   if (id === "customize" && customPrompt) return customizePrompt(customPrompt);
@@ -55,13 +63,9 @@ export function getPromptForAction(id: PromptActionId, customPrompt?: string): s
 }
 
 export const promptActions: Array<{ id: PromptActionId; label: string; icon: string }> = [
-  { id: "varyStrong", label: "Vary strong", icon: "Sparkles" },
-  { id: "varySubtle", label: "Vary subtle", icon: "Sparkle" },
-  { id: "changeStyle", label: "Change style", icon: "Brush" },
-  { id: "remixColors", label: "Remix colors", icon: "Palette" },
-  { id: "shuffleLayout", label: "Shuffle layout", icon: "LayoutGrid" },
-  { id: "seeOtherViews", label: "See other views", icon: "LayoutTemplate" },
+  { id: "makeVariant", label: "Make variant", icon: "Sparkles" },
+  { id: "restyle", label: "Restyle", icon: "Brush" },
   { id: "customize", label: "Customize", icon: "Settings" },
 ];
 
-export { varyStrongPrompt, varySubtlePrompt, changeStylePrompt, remixColorsPrompt, shuffleLayoutPrompt, seeOtherViewsPrompt, customizePrompt };
+export { makeVariantPrompt, restylePrompt, explorePrompt, remixColorsPrompt, remixLayoutPrompt, customizePrompt };
