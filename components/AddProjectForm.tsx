@@ -97,8 +97,8 @@ export function AddProjectForm({ onAdded }: { onAdded: () => void }) {
         if (done) break;
         buffer += decoder.decode(value, { stream: true });
 
-        // Extract and handle PATINA markers
-        const markerPattern = /\x00PATINA:([^\x00]+)\x00/g;
+        // Extract and handle SOUPCAN markers
+        const markerPattern = /\x00SOUPCAN:([^\x00]+)\x00/g;
         let match;
         while ((match = markerPattern.exec(buffer)) !== null) {
           const payload = match[1];
@@ -110,7 +110,7 @@ export function AddProjectForm({ onAdded }: { onAdded: () => void }) {
         }
 
         // Strip all markers, accumulate HTML
-        html += buffer.replace(/\x00PATINA:[^\x00]*\x00/g, "");
+        html += buffer.replace(/\x00SOUPCAN:[^\x00]*\x00/g, "");
         buffer = "";
       }
 

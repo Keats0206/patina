@@ -26,7 +26,7 @@ export function injectSelectionScript(html: string): string {
     }
     function broadcast(){
       var snippets=Array.from(selected).map(function(el){return{html:el.outerHTML,label:label(el)};});
-      window.parent.postMessage({type:'patina-selection',snippets:snippets},'*');
+      window.parent.postMessage({type:'soupcan-selection',snippets:snippets},'*');
     }
     document.addEventListener('mouseover',function(e){
       var el=e.target;if(SKIP.has(el.tagName)||selected.has(el))return;

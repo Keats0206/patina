@@ -20,7 +20,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Patina",
+  title: "Soupcan",
   description: "AI design explorer",
 };
 

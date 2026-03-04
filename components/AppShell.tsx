@@ -55,7 +55,7 @@ function Sidebar() {
             letterSpacing: "-0.01em",
           }}
         >
-          Patina
+          Soupcan
         </span>
       </div>
 

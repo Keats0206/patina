@@ -5,10 +5,10 @@ export interface Project {
   createdAt: string;
 }
 
-const STORAGE_KEY = "patina-projects";
+const STORAGE_KEY = "soupcan-projects";
 
 /** SessionStorage key prefix for initial AI-generated HTML when importing a URL. Value is read once then cleared. */
-export const INITIAL_HTML_STORAGE_KEY_PREFIX = "patina-initial-";
+export const INITIAL_HTML_STORAGE_KEY_PREFIX = "soupcan-initial-";
 
 function safeParse<T>(json: string, fallback: T): T {
   try {
@@ -60,12 +60,12 @@ export function deleteProject(id: string): void {
   if (typeof window === "undefined") return;
   const projects = getStoredProjects().filter((p) => p.id !== id);
   setStoredProjects(projects);
-  localStorage.removeItem(`patina-variants-${id}`);
-  localStorage.removeItem(`patina-project-context-${id}`);
+  localStorage.removeItem(`soupcan-variants-${id}`);
+  localStorage.removeItem(`soupcan-project-context-${id}`);
   sessionStorage.removeItem(`${INITIAL_HTML_STORAGE_KEY_PREFIX}${id}`);
 }
 
-const USER_CONTEXT_KEY = "patina-user-context";
+const USER_CONTEXT_KEY = "soupcan-user-context";
 
 export function getUserContext(): string {
   if (typeof window === "undefined") return "";
@@ -79,10 +79,10 @@ export function setUserContext(context: string): void {
 
 export function getProjectContext(projectId: string): string {
   if (typeof window === "undefined") return "";
-  return window.localStorage.getItem(`patina-project-context-${projectId}`) ?? "";
+  return window.localStorage.getItem(`soupcan-project-context-${projectId}`) ?? "";
 }
 
 export function setProjectContext(projectId: string, context: string): void {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(`patina-project-context-${projectId}`, context);
+  window.localStorage.setItem(`soupcan-project-context-${projectId}`, context);
 }

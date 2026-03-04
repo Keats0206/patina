@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   if (!sourceHtml && typeof sourceUrl === "string") {
     try {
       const res = await fetch(sourceUrl, {
-        headers: { "User-Agent": "Patina/1.0" },
+        headers: { "User-Agent": "Soupcan/1.0" },
         next: { revalidate: 0 },
       });
       if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);

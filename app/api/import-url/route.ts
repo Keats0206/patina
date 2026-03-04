@@ -38,23 +38,23 @@ export async function POST(request: Request) {
 
   const stream = new ReadableStream({
     async start(controller) {
-      controller.enqueue(encoder.encode("\x00PATINA:fetching\x00"));
+      controller.enqueue(encoder.encode("\x00SOUPCAN:fetching\x00"));
 
       let sourceHtml: string;
       try {
         const res = await fetch(url, {
-          headers: { "User-Agent": "Patina/1.0 (Design import)" },
+          headers: { "User-Agent": "Soupcan/1.0 (Design import)" },
           next: { revalidate: 0 },
         });
         if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
         sourceHtml = await res.text();
       } catch {
-        controller.enqueue(encoder.encode("\x00PATINA:error:Failed to fetch URL\x00"));
+        controller.enqueue(encoder.encode("\x00SOUPCAN:error:Failed to fetch URL\x00"));
         controller.close();
         return;
       }
 
-      controller.enqueue(encoder.encode("\x00PATINA:processing\x00"));
+      controller.enqueue(encoder.encode("\x00SOUPCAN:processing\x00"));
 
       const result = streamText({
         model: gateway("anthropic/claude-opus-4.5"),

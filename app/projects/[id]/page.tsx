@@ -572,7 +572,7 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     if (typeof id !== "string" || !project || typeof window === "undefined") return;
     try {
-      const raw = localStorage.getItem(`patina-variants-${id}`);
+      const raw = localStorage.getItem(`soupcan-variants-${id}`);
       if (!raw) return;
       const parsed = JSON.parse(raw) as Array<{ id: string; html: string; label: string; parentId: string | null }>;
       if (Array.isArray(parsed) && parsed.length > 0) {
@@ -629,7 +629,7 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     if (typeof id !== "string" || variants.length === 0 || typeof window === "undefined") return;
     try {
-      localStorage.setItem(`patina-variants-${id}`, JSON.stringify(variants));
+      localStorage.setItem(`soupcan-variants-${id}`, JSON.stringify(variants));
     } catch {
       // ignore
     }
@@ -648,7 +648,7 @@ export default function ProjectDetailPage() {
   useEffect(() => {
     if (!selectMode) return;
     function handler(e: MessageEvent) {
-      if (e.data?.type === "patina-selection") {
+      if (e.data?.type === "soupcan-selection") {
         setSelectedSnippets(e.data.snippets ?? []);
       }
     }

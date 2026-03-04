@@ -78,7 +78,7 @@ export default function PricingPage() {
             textDecoration: "none",
           }}
         >
-          Patina
+          Soupcan
         </Link>
         <span style={{ fontSize: 13, color: "var(--border)" }}>/</span>
         <span style={{ fontSize: 13, color: "var(--foreground)", fontWeight: 500 }}>

@@ -67,7 +67,7 @@ export default function AuthPage() {
               letterSpacing: "-0.01em",
             }}
           >
-            Patina
+            Soupcan
           </span>
         </div>
 
